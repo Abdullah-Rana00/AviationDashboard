@@ -1,0 +1,6 @@
+let
+    Source = Csv.Document(File.Contents("C:\Users\USer\OneDrive - University of Reading\CS3IP16 - Individual Project\Better Data\Airport Numbers Summary\Number of Passengers\Passengers 2012.csv"),[Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"rundate", type datetime}, {"report_period", Int64.Type}, {"airport_name", type text}, {"this_year_pax", Int64.Type}, {"this_year_total_pax", Int64.Type}, {"Five_years_prev_pax", Int64.Type}, {"Five_years_prev_pax_total", Int64.Type}})
+in
+    #"Changed Type"

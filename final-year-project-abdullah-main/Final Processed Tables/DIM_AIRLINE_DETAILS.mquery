@@ -1,0 +1,28 @@
+let
+    Source = Csv.Document(File.Contents("C:\Users\USer\OneDrive - University of Reading\CS3IP16 - Individual Project\Better Data\Airlines Numbers Summary\Airline Numbers 2016.csv"),[Delimiter=",", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"rundate", type text}, {"reporting_period", Int64.Type}, {"type_of_operations", type text}, {"airline_name", type text}, {"aircraft_km_x1000", Int64.Type}, {"no_flights", Int64.Type}, {"aircraft_hours", Int64.Type}, {"total_passengers_uplifted", Int64.Type}, {"seat_km_available_x1000", Int64.Type}, {"seat_km_used_x1000", Int64.Type}, {"cargo_tonnes_uplifted", Int64.Type}, {"total_tonne_km_available_x1000", Int64.Type}, {"tot_mail_tonne_km_used_x1000", Int64.Type}, {"total_freight_tonne_km_used_x1000", Int64.Type}, {"total_passenger_tonne_km_used_x1000", Int64.Type}}),
+    #"Appended Query" = Table.Combine({#"Changed Type", #"Airline Numbers 2017", #"Airline Numbers 2018", #"Airline Numbers 2019", #"Airline Numbers 2020", #"Airline Numbers 2021", #"Airline Numbers 2010", #"Airline Numbers 2011", #"Airline Numbers 2012", #"Airline Numbers 2013", #"Airline Numbers 2014", #"Airline Numbers 2015"}),
+    #"Removed Blank Rows" = Table.SelectRows(#"Appended Query", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+    #"Added Custom" = Table.AddColumn(#"Removed Blank Rows", "Passenger Capacity Utilisation (%)", each [seat_km_used_x1000] / [seat_km_available_x1000]),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Tonnage Capacity Utilisation (%)", each ([tot_mail_tonne_km_used_x1000] + [total_freight_tonne_km_used_x1000] + [total_passenger_tonne_km_used_x1000]) / [total_tonne_km_available_x1000]),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom1",{{"Passenger Capacity Utilisation (%)", Percentage.Type}, {"Tonnage Capacity Utilisation (%)", Percentage.Type}}),
+    #"Replaced Value" = Table.ReplaceValue(#"Changed Type1","EASYJET AIRLINE COMPANY LTD","EASYJET UK LTD",Replacer.ReplaceText,{"airline_name"}),
+    #"Replaced Errors" = Table.ReplaceErrorValues(#"Replaced Value", {{"Passenger Capacity Utilisation (%)", 0}}),
+    #"Replaced Errors1" = Table.ReplaceErrorValues(#"Replaced Errors", {{"Tonnage Capacity Utilisation (%)", 0}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Replaced Errors1",{"total_tonne_km_available_x1000", "tot_mail_tonne_km_used_x1000", "total_freight_tonne_km_used_x1000", "total_passenger_tonne_km_used_x1000", "rundate"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"reporting_period", "Year"}, {"type_of_operations", "Flight Operation"}, {"airline_name", "Airline Name"}, {"aircraft_km_x1000", "Kilometres Travelled"}, {"no_flights", "Number of Flights"}, {"aircraft_hours", "Hours Travelled"}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Renamed Columns",{"Year", "Flight Operation", "Airline Name", "Kilometres Travelled", "Hours Travelled", "Number of Flights", "total_passengers_uplifted", "seat_km_available_x1000", "seat_km_used_x1000", "cargo_tonnes_uplifted", "Passenger Capacity Utilisation (%)", "Tonnage Capacity Utilisation (%)"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Reordered Columns",{{"total_passengers_uplifted", "Passengers Flown"}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns1",{"seat_km_available_x1000", "seat_km_used_x1000"}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Removed Columns1",{{"cargo_tonnes_uplifted", "Cargo Uplifted (Tonnes)"}}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Renamed Columns2", "Year", "Year - Copy"),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Duplicated Column",{{"Year - Copy", type text}}),
+    #"Added Custom2" = Table.AddColumn(#"Changed Type2", "Airline Year Key", each [Airline Name] & [#"Year - Copy"]),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom2",{{"Airline Year Key", type text}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Changed Type3",{"Year - Copy"}),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Removed Columns2",{"Airline Year Key", "Airline Name", "Year", "Flight Operation", "Kilometres Travelled", "Hours Travelled", "Number of Flights", "Passengers Flown", "Cargo Uplifted (Tonnes)", "Passenger Capacity Utilisation (%)", "Tonnage Capacity Utilisation (%)"}),
+    #"Removed Columns3" = Table.RemoveColumns(#"Reordered Columns1",{"Flight Operation", "Kilometres Travelled", "Hours Travelled", "Number of Flights", "Passengers Flown", "Cargo Uplifted (Tonnes)", "Passenger Capacity Utilisation (%)", "Tonnage Capacity Utilisation (%)"}),
+    #"Removed Duplicates" = Table.Distinct(#"Removed Columns3", {"Airline Year Key"})
+in
+    #"Removed Duplicates"

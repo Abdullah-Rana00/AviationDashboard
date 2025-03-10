@@ -1,0 +1,19 @@
+let
+    Source = Csv.Document(File.Contents("C:\Users\USer\OneDrive - University of Reading\CS3IP16 - Individual Project\Better Data\Airport Numbers Summary\Number of Passengers\Passengers 2016.csv"),[Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"rundate", type datetime}, {"report_period", Int64.Type}, {"airport_name", type text}, {"this_year_pax", Int64.Type}, {"this_year_total_pax", Int64.Type}, {"Five_years_prev_pax", Int64.Type}, {"Five_years_prev_pax_total", Int64.Type}}),
+    #"Appended Query" = Table.Combine({#"Changed Type", #"Passengers 2017", #"Passengers 2018", #"Passengers 2019", #"Passengers 2020", #"Passengers 2021"}),
+    #"Removed Blank Rows" = Table.SelectRows(#"Appended Query", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+    #"Removed Columns" = Table.RemoveColumns(#"Removed Blank Rows",{"this_year_total_pax", "Five_years_prev_pax", "Five_years_prev_pax_total", "rundate"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"report_period", "Year"}, {"airport_name", "Airport Name"}, {"this_year_pax", "Number of Passengers"}}),
+    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Airport Group Name", each if [Airport Name] = "GATWICK" or [Airport Name] = "HEATHROW" or [Airport Name] = "LONDON CITY" or [Airport Name] = "LUTON" or [Airport Name] = "SOUTHEND" or [Airport Name] = "STANSTED" then "London Area Airports" else "Other UK Airports"),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"Airport Group Name", type text}}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Changed Type1",{"Year", "Airport Group Name", "Airport Name", "Number of Passengers"}),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Reordered Columns", "Year", "Year - Copy"),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Duplicated Column",{{"Year - Copy", type text}}),
+    #"Added Custom1" = Table.AddColumn(#"Changed Type2", "Airport Year Key", each [Airport Name] & [#"Year - Copy"]),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom1",{{"Airport Year Key", type text}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Changed Type3",{"Year - Copy"}),
+    #"Reordered Columns1" = Table.ReorderColumns(#"Removed Columns1",{"Airport Year Key", "Year", "Airport Group Name", "Airport Name", "Number of Passengers"})
+in
+    #"Reordered Columns1"

@@ -1,0 +1,1 @@
+30-60 Late Number = FACT_FLIGHT_and_AIRPORT_INFO[Flights 30-60 Mins Late (%)] * FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights]

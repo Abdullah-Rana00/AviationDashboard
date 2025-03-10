@@ -1,0 +1,1 @@
+CancelledFlights% = CALCULATE(DIVIDE(SUM(FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights Cancelled]),SUM(FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights])))

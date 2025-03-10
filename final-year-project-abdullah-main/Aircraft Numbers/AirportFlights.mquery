@@ -1,0 +1,19 @@
+let
+    Source = Csv.Document(File.Contents("C:\Users\USer\OneDrive - University of Reading\CS3IP16 - Individual Project\Better Data\Airport Numbers Summary\Number of Flights\Aircraft Movements 2016.csv"),[Delimiter=",", Columns=18, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"rundate", type datetime}, {"report_period", Int64.Type}, {"airport_cluster", Int64.Type}, {"rpt_apt_grp_cd", Int64.Type}, {"rpt_apt_grp_name", type text}, {"rpt_apt_name", type text}, {"grand_total", Int64.Type}, {"air_transport", Int64.Type}, {"air_taxi", Int64.Type}, {"positioning_flights", Int64.Type}, {"local_movements", Int64.Type}, {"test_and_training", Int64.Type}, {"other_flights", Int64.Type}, {"aero_club", Int64.Type}, {"private_flights", Int64.Type}, {"official", Int64.Type}, {"military", Int64.Type}, {"business_aviation", Int64.Type}}),
+    #"Appended Query" = Table.Combine({#"Changed Type", #"Aircraft Movements 2017", #"Aircraft Movements 2018", #"Aircraft Movements 2019", #"Aircraft Movements 2020", #"Aircraft Movements 2021", #"Aircraft Movements 2010", #"Aircraft Movements 2011", #"Aircraft Movements 2012", #"Aircraft Movements 2013", #"Aircraft Movements 2014", #"Aircraft Movements 2015"}),
+    #"Removed Blank Rows" = Table.SelectRows(#"Appended Query", each not List.IsEmpty(List.RemoveMatchingItems(Record.FieldValues(_), {"", null}))),
+    #"Removed Columns" = Table.RemoveColumns(#"Removed Blank Rows",{"air_transport", "air_taxi", "positioning_flights", "local_movements", "test_and_training", "other_flights", "aero_club", "private_flights", "official", "military", "business_aviation", "rundate"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"report_period", "Year"}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns",{"airport_cluster", "rpt_apt_grp_cd"}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Removed Columns1",{{"rpt_apt_grp_name", "Airport Group Name"}, {"rpt_apt_name", "Airport Name"}, {"grand_total", "Total Flights"}}),
+    #"Filtered Rows" = Table.SelectRows(#"Renamed Columns1", each ([Airport Group Name] = "London Area Airports" or [Airport Group Name] = "Other UK Airports")),
+    #"Duplicated Column" = Table.DuplicateColumn(#"Filtered Rows", "Year", "Year - Copy"),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Duplicated Column",{{"Year - Copy", type text}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type1", "Airport Year Key", each [Airport Name] & [#"Year - Copy"]),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom",{{"Airport Year Key", type text}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Changed Type2",{"Year - Copy"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Removed Columns2",{"Airport Year Key", "Year", "Airport Group Name", "Airport Name", "Total Flights"})
+in
+    #"Reordered Columns"

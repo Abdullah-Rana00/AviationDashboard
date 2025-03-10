@@ -1,0 +1,1 @@
+PassengerTotal = SUMX(DISTINCT(DIM_AIRPORT_DETAILS[Airport Year Key]), FIRSTNONBLANK(DIM_AIRPORT_DETAILS[Number of Passengers at Airport for Year], 0))

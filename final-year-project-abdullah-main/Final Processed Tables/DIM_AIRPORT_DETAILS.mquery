@@ -1,0 +1,10 @@
+let
+    Source = Table.NestedJoin(AIRPORT_FLIGHTS, {"Airport Year Key"}, AIRPORT_PASSENGERS, {"Airport Year Key"}, "AIRPORT_PASSENGERS", JoinKind.LeftOuter),
+    #"Expanded AIRPORT_PASSENGERS" = Table.ExpandTableColumn(Source, "AIRPORT_PASSENGERS", {"Number of Passengers"}, {"Number of Passengers"}),
+    #"Filtered Rows" = Table.SelectRows(#"Expanded AIRPORT_PASSENGERS", each ([Number of Passengers] <> null and [Number of Passengers] <> 0 and [Number of Passengers] <> 5)),
+    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"Total Flights", "Number of Flights at Airport for Year"}, {"Number of Passengers", "Number of Passengers at Airport for Year"}}),
+    #"Merged Queries" = Table.NestedJoin(#"Renamed Columns", {"Airport Name"}, #"AIRPORT LOCATION", {"Airport Name"}, "AIRPORT LOCATION", JoinKind.LeftOuter),
+    #"Expanded AIRPORT LOCATION" = Table.ExpandTableColumn(#"Merged Queries", "AIRPORT LOCATION", {"Latitude", "Longitude"}, {"Latitude", "Longitude"}),
+    #"Reordered Columns" = Table.ReorderColumns(#"Expanded AIRPORT LOCATION",{"Airport Year Key", "Year", "Airport Group Name", "Airport Name", "Latitude", "Longitude", "Number of Flights at Airport for Year", "Number of Passengers at Airport for Year"})
+in
+    #"Reordered Columns"

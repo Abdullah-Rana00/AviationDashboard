@@ -1,0 +1,6 @@
+let
+    Source = Csv.Document(File.Contents("C:\Users\USer\OneDrive - University of Reading\CS3IP16 - Individual Project\Better Data\Airport Numbers Summary\Number of Flights\Aircraft Movements 2017.csv"),[Delimiter=",", Columns=18, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"rundate", type datetime}, {"report_period", Int64.Type}, {"airport_cluster", Int64.Type}, {"rpt_apt_grp_cd", Int64.Type}, {"rpt_apt_grp_name", type text}, {"rpt_apt_name", type text}, {"grand_total", Int64.Type}, {"air_transport", Int64.Type}, {"air_taxi", Int64.Type}, {"positioning_flights", Int64.Type}, {"local_movements", Int64.Type}, {"test_and_training", Int64.Type}, {"other_flights", Int64.Type}, {"aero_club", Int64.Type}, {"private_flights", Int64.Type}, {"official", Int64.Type}, {"military", Int64.Type}, {"business_aviation", Int64.Type}})
+in
+    #"Changed Type"

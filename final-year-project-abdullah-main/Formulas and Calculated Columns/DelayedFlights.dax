@@ -1,0 +1,1 @@
+Delayed Flights = FACT_FLIGHT_and_AIRPORT_INFO[DelayedFlights%] * FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights]

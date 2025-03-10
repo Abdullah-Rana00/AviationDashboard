@@ -1,0 +1,4 @@
+UKINTL = 
+VAR _SEL = SELECTCOLUMNS(DIM_AIRLINE_DETAILS, "Airline Name", DIM_AIRLINE_DETAILS[Airline Name])
+RETURN 
+IF (FACT_FLIGHT_and_AIRPORT_INFO[Airline Name] in _SEL, "UK", "International")

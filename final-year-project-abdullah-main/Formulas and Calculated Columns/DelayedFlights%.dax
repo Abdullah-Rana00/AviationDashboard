@@ -1,0 +1,1 @@
+DelayedFlights% = FACT_FLIGHT_and_AIRPORT_INFO[Flights 5-30 Mins Late (%)]/6 + FACT_FLIGHT_and_AIRPORT_INFO[Flights 30-60 Mins Late (%)] + FACT_FLIGHT_and_AIRPORT_INFO[Flights 1-2 Hours Late (%)] + FACT_FLIGHT_and_AIRPORT_INFO[Flights 2+ Hours Late (%)]

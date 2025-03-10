@@ -1,0 +1,1 @@
+DelayedFlightsNN = CALCULATE(DIVIDE(SUM(FACT_FLIGHT_and_AIRPORT_INFO[Delayed Flights]),SUM(FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights]))) * 100

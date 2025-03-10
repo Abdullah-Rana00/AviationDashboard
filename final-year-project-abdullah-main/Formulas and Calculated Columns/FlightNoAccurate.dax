@@ -1,0 +1,1 @@
+Flight No Accurate = SUM(FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights]) - sum(FACT_FLIGHT_and_AIRPORT_INFO[Delayed Flights]) - sum(FACT_FLIGHT_and_AIRPORT_INFO[Number of Flights Cancelled])

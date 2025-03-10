@@ -1,0 +1,6 @@
+let
+    Source = Csv.Document(File.Contents("C:\Users\USer\OneDrive - University of Reading\CS3IP16 - Individual Project\Better Data\Airlines Numbers Summary\Airline Numbers 2010.csv"),[Delimiter=",", Columns=15, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"rundate", type text}, {"reporting_period", Int64.Type}, {"type_of_operations", type text}, {"airline_name", type text}, {"aircraft_km_x1000", Int64.Type}, {"no_flights", Int64.Type}, {"aircraft_hours", Int64.Type}, {"total_passengers_uplifted", Int64.Type}, {"seat_km_available_x1000", Int64.Type}, {"seat_km_used_x1000", Int64.Type}, {"cargo_tonnes_uplifted", Int64.Type}, {"total_tonne_km_available_x1000", Int64.Type}, {"tot_mail_tonne_km_used_x1000", Int64.Type}, {"total_freight_tonne_km_used_x1000", Int64.Type}, {"total_passenger_tonne_km_used_x1000", Int64.Type}})
+in
+    #"Changed Type"
